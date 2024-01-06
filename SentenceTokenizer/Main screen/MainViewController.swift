@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class MainViewController: UIViewController {
 
@@ -16,14 +17,24 @@ class MainViewController: UIViewController {
     
     // MARK: — Private properties
     
+    private var mainVM =  MainViewModel()
     private var keyboardIsVisible = false
+    private var subscriptions = Set<AnyCancellable>()
+    
+    // MARK: — Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
+        
+        mainVM.outputText()
+            .compactMap { $0 }
+            .assign(to: \.text, on: outputLabel)
+            .store(in: &subscriptions)
     }
     
     // MARK: — Actions
@@ -64,6 +75,12 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        mainVM.update(inputText: textField.text)
+        return textField.resignFirstResponder()
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        mainVM.update(inputText: textField.text)
         textField.resignFirstResponder()
     }
 }
