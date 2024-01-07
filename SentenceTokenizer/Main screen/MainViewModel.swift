@@ -29,7 +29,7 @@ final class MainViewModel {
         }
         
         let newSentenceTriggerWords: [String]
-        var tokenizedWords: [String] = []
+        var tokenizedWords: [(word: String, tag: NLTag?)] = []
         
         switch language {
         case .english:
@@ -54,35 +54,40 @@ final class MainViewModel {
             if !tokenizedWords.isEmpty {
                 if newSentenceTriggerWords.contains(word) {
                     tokenizedWords.removeLast()
+                    
+                    if tokenizedWords.last?.tag == .punctuation {
+                        tokenizedWords.removeLast()
+                    }
+                    
                     lastAppendedWord = word
-                    tokenizedWords.append(". \(word.capitalized)")
+                    tokenizedWords.append((". \(word.capitalized)", tag))
                 } else {
                     lastAppendedWord = word
-                    tokenizedWords.append(word)
+                    tokenizedWords.append((word, tag))
                 }
             } else {
                 lastAppendedWord = word
-                tokenizedWords.append(word)
+                tokenizedWords.append((word, tag))
                 /// It's not mentioned in the technical requirements,
                 /// but it seems like there's no need to start a new sentence in the beginning of the whole phrase, even if it starts with a trigger word.
             }
             return true
         }
         
-        if tokenizedWords.last == " " {
+        if tokenizedWords.last?.word == " " {
             tokenizedWords.removeLast()
         }
         
         if newSentenceTriggerWords.contains(lastAppendedWord) {
             tokenizedWords.removeLast()
-            tokenizedWords.append(" ")
-            tokenizedWords.append(lastAppendedWord)
+            tokenizedWords.append((" ", .whitespace))
+            tokenizedWords.append((lastAppendedWord, .word))
             /// Again, it's not mentioned in the technical requirements,
             /// but I assume that we don't need to start a new sentence if the whole phrase ends with a trigger word.
         }
                
-        tokenizedWords.forEach { word in
-            mutableText += word
+        tokenizedWords.forEach { token in
+            mutableText += token.word
         }
         
         tokenizedOutputText = mutableText
