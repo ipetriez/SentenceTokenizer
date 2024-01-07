@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import NaturalLanguage
 
 protocol MainViewModelDelegate {
     func outputText() -> AnyPublisher<String, Never>
@@ -22,7 +23,76 @@ final class MainViewModel {
     // MARK: — Private methods
     
     private func createOutputText(from inputText: String) {
-        tokenizedOutputText = inputText.uppercased()
+        guard !inputText.isEmpty, let language = detectLanguage(sentence: inputText) else {
+            tokenizedOutputText = inputText
+            return
+        }
+        
+        let newSentenceTriggerWords: [String]
+        var tokenizedWords: [String] = []
+        
+        switch language {
+        case .english:
+            newSentenceTriggerWords = ["IF", "If", "if", "AND", "And", "and"]
+        case .spanish:
+            newSentenceTriggerWords = ["SI", "Si", "si", "Y", "y"]
+        case .german:
+            newSentenceTriggerWords = ["ODER", "Oder", "oder", "UND", "Und", "und"]
+        case .russian:
+            newSentenceTriggerWords = ["ЕСЛИ", "Если", "если", "И", "и"]
+        default:
+            newSentenceTriggerWords = []
+        }
+        
+        let tokenizer = NLTagger(tagSchemes: [.tokenType])
+        tokenizer.string = inputText
+        var mutableText = ""
+        var lastAppendedWord = ""
+        
+        tokenizer.enumerateTags(in: inputText.startIndex ..< inputText.endIndex, unit: .word, scheme: .tokenType) { tag, tokenRange in
+            let word = String(inputText[tokenRange])
+            if !tokenizedWords.isEmpty {
+                if newSentenceTriggerWords.contains(word) {
+                    tokenizedWords.removeLast()
+                    lastAppendedWord = word
+                    tokenizedWords.append(". \(word.capitalized)")
+                } else {
+                    lastAppendedWord = word
+                    tokenizedWords.append(word)
+                }
+            } else {
+                lastAppendedWord = word
+                tokenizedWords.append(word)
+                /// It's not mentioned in the technical requirements,
+                /// but it seems like there's no need to start a new sentence in the beginning of the whole phrase, even if it starts with a trigger word.
+            }
+            return true
+        }
+        
+        if tokenizedWords.last == " " {
+            tokenizedWords.removeLast()
+        }
+        
+        if newSentenceTriggerWords.contains(lastAppendedWord) {
+            tokenizedWords.removeLast()
+            tokenizedWords.append(" ")
+            tokenizedWords.append(lastAppendedWord)
+            /// Again, it's not mentioned in the technical requirements,
+            /// but I assume that we don't need to start a new sentence if the whole phrase ends with a trigger word.
+        }
+               
+        tokenizedWords.forEach { word in
+            mutableText += word
+        }
+        
+        tokenizedOutputText = mutableText
+    }
+    
+    private func detectLanguage(sentence: String) -> NLLanguage? {
+        let tagger = NLTagger(tagSchemes: [.language])
+        tagger.string = sentence
+        let detectedLanguage = tagger.dominantLanguage
+        return detectedLanguage
     }
 }
 

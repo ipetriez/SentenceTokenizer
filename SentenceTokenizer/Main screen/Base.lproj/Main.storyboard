@@ -16,14 +16,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please type in your sentence below:" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w16-1A-gAe">
-                                <rect key="frame" x="8" y="59" width="377" height="734"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w16-1A-gAe">
+                                <rect key="frame" x="8" y="59" width="377" height="634"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fT4-ll-0I0">
-                                <rect key="frame" x="8" y="763" width="377" height="30"/>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Please type in your complex sentence here..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fT4-ll-0I0">
+                                <rect key="frame" x="8" y="743" width="377" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="L0s-Iu-fdP"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
@@ -36,11 +39,10 @@
                         <constraints>
                             <constraint firstItem="w16-1A-gAe" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="2KH-Io-ZSd"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="w16-1A-gAe" secondAttribute="trailing" constant="8" id="9eP-Vt-ROL"/>
+                            <constraint firstItem="fT4-ll-0I0" firstAttribute="top" secondItem="w16-1A-gAe" secondAttribute="bottom" constant="50" id="FhI-hv-IhD"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="fT4-ll-0I0" secondAttribute="bottom" constant="25" id="Irx-9Y-0iQ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="fT4-ll-0I0" secondAttribute="trailing" constant="8" id="Mmd-AH-BPU"/>
                             <constraint firstItem="w16-1A-gAe" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="OOv-ZA-TZq"/>
-                            <constraint firstItem="w16-1A-gAe" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="QUs-BJ-axM"/>
-                            <constraint firstItem="fT4-ll-0I0" firstAttribute="top" secondItem="w16-1A-gAe" secondAttribute="bottom" constant="-30" id="Qu3-dJ-U3Y"/>
                             <constraint firstItem="fT4-ll-0I0" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="qTj-xr-3oy"/>
                         </constraints>
                     </view>
