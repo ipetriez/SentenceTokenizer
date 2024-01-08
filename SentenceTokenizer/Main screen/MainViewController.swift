@@ -28,12 +28,21 @@ class MainViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        let textPublisher = NotificationCenter.default.publisher(for: UITextField.textDidChangeNotification, object: inputTextField).compactMap { ($0.object as? UITextField)?.text }
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
+        
+        // MARK: — Subscriptions
         
         mainVM.outputText()
             .compactMap { $0 }
             .assign(to: \.text, on: outputLabel)
+            .store(in: &subscriptions)
+        
+        textPublisher
+            .sink { [weak self] text in
+                self?.mainVM.update(inputText: text)
+            }
             .store(in: &subscriptions)
     }
     
@@ -68,19 +77,5 @@ class MainViewController: UIViewController {
     
     @objc private func dismissKeyboard() {
         _ = inputTextField.resignFirstResponder()
-    }
-}
-
-// MARK: — UITextFieldDelegate
-
-extension MainViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        mainVM.update(inputText: textField.text)
-        return textField.resignFirstResponder()
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        mainVM.update(inputText: textField.text)
-        textField.resignFirstResponder()
     }
 }

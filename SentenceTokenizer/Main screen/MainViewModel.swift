@@ -47,7 +47,6 @@ final class MainViewModel {
         let tokenizer = NLTagger(tagSchemes: [.tokenType])
         tokenizer.string = inputText
         var mutableText = ""
-        var lastAppendedWord = ""
         
         tokenizer.enumerateTags(in: inputText.startIndex ..< inputText.endIndex, unit: .word, scheme: .tokenType) { tag, tokenRange in
             let word = String(inputText[tokenRange])
@@ -59,31 +58,17 @@ final class MainViewModel {
                         tokenizedWords.removeLast()
                     }
                     
-                    lastAppendedWord = word
-                    tokenizedWords.append((". \(word.capitalized)", tag))
+                    tokenizedWords.append(("\n — \(word.capitalized)", tag))
                 } else {
-                    lastAppendedWord = word
                     tokenizedWords.append((word, tag))
                 }
             } else {
-                lastAppendedWord = word
+                tokenizedWords.append((" ", .whitespace))
+                tokenizedWords.append(("—", .punctuation))
+                tokenizedWords.append((" ", .whitespace))
                 tokenizedWords.append((word, tag))
-                /// It's not mentioned in the technical requirements,
-                /// but it seems like there's no need to start a new sentence in the beginning of the whole phrase, even if it starts with a trigger word.
             }
             return true
-        }
-        
-        if tokenizedWords.last?.word == " " {
-            tokenizedWords.removeLast()
-        }
-        
-        if newSentenceTriggerWords.contains(lastAppendedWord) {
-            tokenizedWords.removeLast()
-            tokenizedWords.append((" ", .whitespace))
-            tokenizedWords.append((lastAppendedWord, .word))
-            /// Again, it's not mentioned in the technical requirements,
-            /// but I assume that we don't need to start a new sentence if the whole phrase ends with a trigger word.
         }
                
         tokenizedWords.forEach { token in
